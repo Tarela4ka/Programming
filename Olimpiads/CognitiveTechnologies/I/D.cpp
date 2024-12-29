@@ -1,26 +1,58 @@
 #include<bits/stdc++.h>
-
 using namespace std;
+
 #define int long long int
-using vi = vector<int>;
-using vvi = vector<vi>;
-using vc = vector<char>;
-#define all(a) a.begin(), a.end()
+#define fr(i, a, b) for(int i = (a); i <= (b); i++)
+#define rf(i, a, b) for(int i = (a); i >= (b); i--)
+#define fe(c, a) for(auto& c : a)
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+template <typename T>
+using v = vector<T>;
+using ii = pair<int, int>;
 
 signed main(){
-    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    ios::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+    #ifdef DEBUG
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
-    int t;
-    cin >> t;
-    for(int caseN = 0; caseN < t; caseN++){
-        map<int, set<int>> p;
-        int n; cin >> n;
-        for(int i = 0; i < n; i++){
+    #endif
+    
+    int t; cin >> t;
+    while(t--){
+        int n; cin >> n; 
+        v<v<int>> cnt(n+2);
+        fr(i, 0, n-1){
             int c; cin >> c;
-            p[c].insert(i);
-        } 
-        
+            cnt[c].push_back(i);
+        }
+        set<int> s;
+        int k = 1, ans = 1;
+        while(!cnt[k].empty()) {
+            s.insert(*cnt[k].rbegin());
+            cnt[k].pop_back();
+        }
+        int i = -1;
+        while(!s.empty()){
+            auto it = upper_bound(all(s), i);
+            if (it == s.end()){
+                it = s.begin();
+                ans++;
+            }
+            i = *it;
+            s.erase(it); k++;
+            while(!cnt[k].empty()) {
+                s.insert(*cnt[k].rbegin());
+                cnt[k].pop_back();
+            }
+        }
+        bool f = false;
+        fe(c, cnt) 
+            f = (f || !c.empty());
+
+        if (f) cout << "-1\n";
+        else cout << ans << '\n';
     }
     return 0;
 }

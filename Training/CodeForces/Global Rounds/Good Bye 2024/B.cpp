@@ -10,6 +10,7 @@ using namespace std;
 #define rall(a) a.rbegin(), a.rend()
 #define mk(a,b) make_pair(a,b)
 using ii = pair<int, int>;
+using ic = pair<int, char>;
 template <typename T>
 using v = vector<T>;
 
@@ -25,19 +26,36 @@ signed main(){
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
     #endif
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-
-    int n; cin >> n;
-    v<int> a(n); fe(c, a) cin >> c;
-    int ans = 0;
-    fr(k, 1, n) ans+= (n/k*((k-1)*(k-1)+k-1) + ((n%k)*(n%k)+n%k))/2;
-    cout << ans;
     
+    int t; cin >> t;
+    while(t--){
+        int n; cin >> n;
+        v<int> s;
+        v<ii> a(n);
+        v<int> vis(2*n+3);
+        fe(c, a){
+            auto& [l, r] = c;
+            cin >> l >> r;
+            if (l == r) {
+                if (!vis[l]) s.push_back(l);
+                vis[l]++;
+            }
+        }
+        sort(all(s));
+        fr(i, 0, n-1){
+            auto [l, r] = a[i];
+            if ((r-l+1 > (upper_bound(all(s), r)-lower_bound(all(s), l))) || (r-l == 0 && vis[l] == 1))
+                cout << 1;
+            else
+                cout << 0;
+        }
+        cout << endl;
+    }
+
     #ifdef DEBUG
     t2=clock();
     float diff ((float)t2-(float)t1);
-    cout << '\n' << diff << "ms";
+    cout << '\n' << diff << "ms\n";
     #endif
     return 0;
 }

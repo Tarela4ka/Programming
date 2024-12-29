@@ -10,11 +10,18 @@ using namespace std;
 #define rall(a) a.rbegin(), a.rend()
 #define mk(a,b) make_pair(a,b)
 using ii = pair<int, int>;
+using ic = pair<int, char>;
 template <typename T>
-using v = vector<T>;
+using vec = vector<T>;
 
 const int MOD = 1000000007;
 const int INF = 1000000000;
+
+int power(int b, int n){
+    int r = 1;
+    fr(i, 0, n-1) r*=b;
+    return r;
+}
 
 signed main(){
     ios::sync_with_stdio(false); 
@@ -25,19 +32,30 @@ signed main(){
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
     #endif
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-
-    int n; cin >> n;
-    v<int> a(n); fe(c, a) cin >> c;
-    int ans = 0;
-    fr(k, 1, n) ans+= (n/k*((k-1)*(k-1)+k-1) + ((n%k)*(n%k)+n%k))/2;
-    cout << ans;
     
+    int t; cin >> t;
+    while(t--){
+        int n; cin >> n;
+        vec<int> a(n); fe(c, a) cin >> c;
+        int q; cin >> q;
+        while(q--){
+            int z, k; cin >> z >> k;
+            if (z == 1)fe(c, a) c&=k;
+            if (z == 2)fe(c, a) c|=k;
+            if (z == 3)fe(c, a) c^=k;
+            if (z == 4)cout<< a[k-1] <<endl;
+            if (z == 5){
+                vec<int> b = a;
+                sort(all(b));
+                cout << b[k-1] << endl;
+            }
+        }
+    }
+
     #ifdef DEBUG
     t2=clock();
     float diff ((float)t2-(float)t1);
-    cout << '\n' << diff << "ms";
+    cout << '\n' << diff << "ms\n";
     #endif
     return 0;
 }

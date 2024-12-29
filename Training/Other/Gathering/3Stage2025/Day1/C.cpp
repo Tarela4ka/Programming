@@ -40,13 +40,6 @@ signed main(){
         sump[i] = sump[i-1]+cnt[i]*i;
     }
 
-    
-
-    // fe(c, sump) cout << c << " ";
-    // cout << endl;
-    // fe(c, cntp) cout << c << " ";
-    // cout << endl;
-
     int ans = 0;
     fr(i, 2, n){
         if (!cnt[i]) continue;

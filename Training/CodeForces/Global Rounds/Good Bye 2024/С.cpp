@@ -10,6 +10,7 @@ using namespace std;
 #define rall(a) a.rbegin(), a.rend()
 #define mk(a,b) make_pair(a,b)
 using ii = pair<int, int>;
+using ic = pair<int, char>;
 template <typename T>
 using v = vector<T>;
 
@@ -25,19 +26,22 @@ signed main(){
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
     #endif
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-
-    int n; cin >> n;
-    v<int> a(n); fe(c, a) cin >> c;
-    int ans = 0;
-    fr(k, 1, n) ans+= (n/k*((k-1)*(k-1)+k-1) + ((n%k)*(n%k)+n%k))/2;
-    cout << ans;
     
+    int t; cin >> t;
+    while(t--){
+        int n, k; cin >> n >> k;
+        int tn = n; int ans = 0; int c = 1;
+        while(tn >= k){
+            if (tn&1) ans += c*(tn/2+1) + tn*(c*c-c)/2 + (n%c)*c/2;
+            c <<= 1; tn >>= 1; 
+        }
+        cout << ans << endl;
+    }
+
     #ifdef DEBUG
     t2=clock();
     float diff ((float)t2-(float)t1);
-    cout << '\n' << diff << "ms";
+    cout << '\n' << diff << "ms\n";
     #endif
     return 0;
 }

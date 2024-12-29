@@ -22,22 +22,33 @@ signed main(){
     #ifdef DEBUG
     clock_t t1,t2;
     t1=clock();
-    freopen("input.txt", "r", stdin);
+    freopen("T/01", "r", stdin);
     freopen("output.txt", "w", stdout);
     #endif
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-
+    
     int n; cin >> n;
     v<int> a(n); fe(c, a) cin >> c;
-    int ans = 0;
-    fr(k, 1, n) ans+= (n/k*((k-1)*(k-1)+k-1) + ((n%k)*(n%k)+n%k))/2;
-    cout << ans;
-    
+    int q; cin >> q;
+    while(q--){
+        int l, r; cin >> l >> r;
+        l--; r--; v<int> b;
+        if (r-l == 0){
+            printf("%d\n", a[r]);
+            continue;
+        }
+        fr(i, l, r) b.push_back(a[i]);
+        sort(all(b));
+        double ans = ((double)(b[0]+b[1])/2);
+        fr(i, 2, b.size()-1){
+            ans = (double)(ans + b[i])/2;
+        }
+        printf("%.10f\n", ans);
+    } 
+
     #ifdef DEBUG
     t2=clock();
     float diff ((float)t2-(float)t1);
-    cout << '\n' << diff << "ms";
+    cout << '\n' << diff << "ms\n";
     #endif
     return 0;
 }

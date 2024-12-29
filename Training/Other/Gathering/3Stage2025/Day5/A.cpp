@@ -14,7 +14,8 @@ template <typename T>
 using v = vector<T>;
 
 const int MOD = 1000000007;
-const int INF = 1000000000;
+const int INF = 1e10;
+const int N = 1e6+3;
 
 signed main(){
     ios::sync_with_stdio(false); 
@@ -22,18 +23,21 @@ signed main(){
     #ifdef DEBUG
     clock_t t1,t2;
     t1=clock();
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
     #endif
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
-
-    int n; cin >> n;
-    v<int> a(n); fe(c, a) cin >> c;
-    int ans = 0;
-    fr(k, 1, n) ans+= (n/k*((k-1)*(k-1)+k-1) + ((n%k)*(n%k)+n%k))/2;
-    cout << ans;
     
+    int x, y, n;
+    cin >> x >> y >> n;
+    int m = INF;
+    fr(i, 0, n-1){
+        int c; cin >> c;
+        m = min(m, c);
+    }
+    int ans = min(max(m-1, y), x);
+    if (ans == y) ans -= y/m;
+    cout << ans;
+
     #ifdef DEBUG
     t2=clock();
     float diff ((float)t2-(float)t1);

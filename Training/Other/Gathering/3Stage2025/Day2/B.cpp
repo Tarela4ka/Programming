@@ -15,6 +15,14 @@ using v = vector<T>;
 
 const int MOD = 1000000007;
 const int INF = 1000000000;
+const int ZERO = 0;
+const int N = 1e6+3;
+
+int power(int b, int n){
+    int p = 1;
+    fr(i, 0, n-1) p*=b;
+    return p;
+}
 
 signed main(){
     ios::sync_with_stdio(false); 
@@ -22,18 +30,21 @@ signed main(){
     #ifdef DEBUG
     clock_t t1,t2;
     t1=clock();
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
     #endif
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
-
-    int n; cin >> n;
-    v<int> a(n); fe(c, a) cin >> c;
-    int ans = 0;
-    fr(k, 1, n) ans+= (n/k*((k-1)*(k-1)+k-1) + ((n%k)*(n%k)+n%k))/2;
-    cout << ans;
     
+    int n, k; cin >> n >> k;
+    string s; cin >> s;
+    int p = 0, ans = 0;
+    fe(c, s){
+        if (c == '(') p++;
+        if (c == ')') p--;
+        if (c-'0' == 1) ans += power(2, 2*(k-p));
+    }
+    int c = (power(2, 2*k)-ans);
+    cout << c << " " << ans;
+
     #ifdef DEBUG
     t2=clock();
     float diff ((float)t2-(float)t1);
