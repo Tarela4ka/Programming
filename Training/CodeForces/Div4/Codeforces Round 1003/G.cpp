@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 
 using namespace std;
-#define int long long int
+#define int long long
 #define lll __int128_t
 #define fr(i, a, b) for (int i = (a); i <= (b); ++i)
 #define rf(i, a, b) for (int i = (a); i >= (b); --i)
@@ -16,38 +16,15 @@ using v = vector<T>;
 using vi = v<int>;
 using vii = v<ii>;
 using vvi = v<vi>;
-using vc = v<char>;
-using vvc = v<vc>;
 
 const int MOD = 998244353;
-const int INF = 1e16;
-
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int sub(int a, int b){
-    if (a >= b) return a-b;
-    else return MOD+a-b;
-}
-
-int bin_pow(int n, int p){
-    int res = 1;
-    while(p){
-        if (p&1) res = mult(res, n);
-        n = mult(n, n);
-        p>>=1;
-    }
-    return res;
-}
+const int INF = 1e14+10;
+const int maxn = 1e6+10;
 
 signed main(){
     ios::sync_with_stdio(false); 
     cin.tie(NULL); cout.tie(NULL);
     #ifdef DEBUG
-    srand(time(NULL));
     clock_t t1,t2;
     t1=clock();
     freopen("input.txt", "r", stdin);
@@ -56,29 +33,37 @@ signed main(){
 
     int t; cin >> t;
     while(t--){
-        int n, m; cin >> n >> m;
-        vi sieve(m+1, 0);
-        vi fact(m+1, 1), nf(m+1, 0);
-        fr(i, 2, m){
+        int n; cin >> n;
+        vi cnt(n+1, 0);
+        vi a(n); fe(c, a) {
+            cin >> c;
+            cnt[c]++;
+        }
+        vi sieve(n+1, 0), primes;
+        fr(i, 2, n){
             if (!sieve[i]){
-                for(int j = i; j <= m; j+=i){
-                    sieve[j] = 1;
-                    fact[j] *= i;
-                    nf[j]++;
+                primes.push_back(i);
+                for(int j = i*i; j <= n; j += i) sieve[j] = 1;
+            }
+        }
+        int ans = 0;
+        int m = primes.size()-1;
+        fr(i, 0, m){
+            int c = primes[i];
+            fr(j, i, m){
+                int p = primes[j];
+                if (c != p)
+                    ans += cnt[c]*cnt[p]; 
+                
+                if (c * p <= n){
+                    ans += cnt[c]*cnt[c*p];
+                    if (c != p)
+                        ans += cnt[p]*cnt[c*p];
+                    ans += (cnt[c*p]*cnt[c*p]+cnt[c*p])/2;
                 }
             }
         }
-        int res = 0;
-        fr(j, 1, m){
-            if (fact[j] == j){
-                if (nf[j]%2 == 0){
-                    res = sum(res, bin_pow(m/j, n)); 
-                }else{
-                    res = sub(res, bin_pow(m/j, n));
-                }
-            }
-        }
-        cout << res << "\n";
+        cout << ans << endl;
     }
 
     #ifdef DEBUG

@@ -9,6 +9,7 @@ using namespace std;
 #define all(a) a.begin(), a.end()
 #define rall(a) a.rbegin(), a.rend()
 #define mk(a,b) make_pair(a,b)
+#define pb(b) push_back(b)
 using ii = pair<int, int>;
 using ic = pair<int, char>;
 template <typename T>
@@ -21,26 +22,16 @@ using vvc = v<vc>;
 
 const int MOD = 998244353;
 const int INF = 1e16;
+vvi g;
 
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int sub(int a, int b){
-    if (a >= b) return a-b;
-    else return MOD+a-b;
-}
-
-int bin_pow(int n, int p){
-    int res = 1;
-    while(p){
-        if (p&1) res = mult(res, n);
-        n = mult(n, n);
-        p>>=1;
+void dfs(vi& vis, vi& dist, int v){
+    vis[v] = 1;
+    fe(c, g[v]){
+        if (!vis[c]){
+            dist[c] = dist[v]+1;
+            dfs(vis, dist, c);
+        }
     }
-    return res;
 }
 
 signed main(){
@@ -56,29 +47,32 @@ signed main(){
 
     int t; cin >> t;
     while(t--){
-        int n, m; cin >> n >> m;
-        vi sieve(m+1, 0);
-        vi fact(m+1, 1), nf(m+1, 0);
-        fr(i, 2, m){
-            if (!sieve[i]){
-                for(int j = i; j <= m; j+=i){
-                    sieve[j] = 1;
-                    fact[j] *= i;
-                    nf[j]++;
-                }
-            }
+        int n; cin >> n;
+        g.clear(); g.resize(n);
+        fr(i, 0, n-2){
+            int a, b; cin >> a >> b; a--; b--;
+            g[a].pb(b); g[b].pb(a);
         }
-        int res = 0;
-        fr(j, 1, m){
-            if (fact[j] == j){
-                if (nf[j]%2 == 0){
-                    res = sum(res, bin_pow(m/j, n)); 
-                }else{
-                    res = sub(res, bin_pow(m/j, n));
-                }
+        vi vis(n, 0), dist(n, INF);
+        dist[0] = 0;
+        dfs(vis, dist, 0);
+        int v = 0;
+        fr(i, 0, n-1)
+            if (dist[i] > dist[v])
+                v = i;
+        // cout << v << " ";
+        dist.assign(n, INF); vis.assign(n, 0);
+        dist[v] = 0;
+        dfs(vis, dist, v);
+        int ans = dist[0];
+        v = 0;
+        fr(i, 0, n-1)
+            if (dist[i] > dist[v]){
+                v = i;              
+                ans = dist[i];
             }
-        }
-        cout << res << "\n";
+        // cout << v << "\n";
+        cout << 2*(n-1)-ans << "\n";
     }
 
     #ifdef DEBUG

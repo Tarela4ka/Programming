@@ -9,6 +9,7 @@ using namespace std;
 #define all(a) a.begin(), a.end()
 #define rall(a) a.rbegin(), a.rend()
 #define mk(a,b) make_pair(a,b)
+#define pb(b) push_back(b)
 using ii = pair<int, int>;
 using ic = pair<int, char>;
 template <typename T>
@@ -22,25 +23,50 @@ using vvc = v<vc>;
 const int MOD = 998244353;
 const int INF = 1e16;
 
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int sub(int a, int b){
-    if (a >= b) return a-b;
-    else return MOD+a-b;
+int n, m;
+vi a, b;
+
+void build(vi& ans, set<int>& nums, set<int>& inds, int prev){
+    fe(num, nums){
+        int c = *inds.begin();
+        if (num == c){
+            if (inds.size() == 1){
+                ans[c-1] = num;
+                swap(ans[c-1], ans[prev-1]);
+                inds.erase(c);
+            }else{
+                inds.erase(c);
+                int i = *inds.begin();
+                ans[i-1] = num;
+                inds.erase(i);
+                inds.insert(c);
+                prev = i;
+            }
+        }else{
+            ans[c-1] = num;
+            prev = c;
+            inds.erase(c);
+        }
+    }
 }
 
-int bin_pow(int n, int p){
-    int res = 1;
-    while(p){
-        if (p&1) res = mult(res, n);
-        n = mult(n, n);
-        p>>=1;
+void allbuild(vi& ans){
+    set<int> nums, inds;
+    vi cnt(n+1, 0);
+    fe(c, b){
+        cnt[c]++;
+        nums.insert(c);
+        inds.insert(c);
     }
-    return res;
+    int prev;
+    fe(c, b){
+        if (cnt[a[c-1]] == 1){
+            ans[c-1] = a[c-1];
+            nums.erase(a[c-1]); inds.erase(c);
+            prev = c;
+        }
+    }
+    build(ans, nums, inds, prev);
 }
 
 signed main(){
@@ -56,29 +82,19 @@ signed main(){
 
     int t; cin >> t;
     while(t--){
-        int n, m; cin >> n >> m;
-        vi sieve(m+1, 0);
-        vi fact(m+1, 1), nf(m+1, 0);
-        fr(i, 2, m){
-            if (!sieve[i]){
-                for(int j = i; j <= m; j+=i){
-                    sieve[j] = 1;
-                    fact[j] *= i;
-                    nf[j]++;
-                }
-            }
+        cin >> n; a.assign(n, 0); fe(c, a) cin >> c;
+        cin >> m; b.assign(m, 0); fe(c, b) cin >> c;
+        set<int> nums, inds;
+        vi ans(n, 0);
+        allbuild(ans);
+        b.clear();
+        fr(i, 0, n-1){
+            if (ans[i] == 0)
+                b.pb(i+1);
         }
-        int res = 0;
-        fr(j, 1, m){
-            if (fact[j] == j){
-                if (nf[j]%2 == 0){
-                    res = sum(res, bin_pow(m/j, n)); 
-                }else{
-                    res = sub(res, bin_pow(m/j, n));
-                }
-            }
-        }
-        cout << res << "\n";
+        allbuild(ans);
+        fe(c, ans) cout << c << ' ';
+        cout << "\n";
     }
 
     #ifdef DEBUG

@@ -19,35 +19,13 @@ using vvi = v<vi>;
 using vc = v<char>;
 using vvc = v<vc>;
 
-const int MOD = 998244353;
+const int MOD = 1e9+7;
 const int INF = 1e16;
-
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int sub(int a, int b){
-    if (a >= b) return a-b;
-    else return MOD+a-b;
-}
-
-int bin_pow(int n, int p){
-    int res = 1;
-    while(p){
-        if (p&1) res = mult(res, n);
-        n = mult(n, n);
-        p>>=1;
-    }
-    return res;
-}
 
 signed main(){
     ios::sync_with_stdio(false); 
     cin.tie(NULL); cout.tie(NULL);
     #ifdef DEBUG
-    srand(time(NULL));
     clock_t t1,t2;
     t1=clock();
     freopen("input.txt", "r", stdin);
@@ -56,29 +34,23 @@ signed main(){
 
     int t; cin >> t;
     while(t--){
-        int n, m; cin >> n >> m;
-        vi sieve(m+1, 0);
-        vi fact(m+1, 1), nf(m+1, 0);
-        fr(i, 2, m){
-            if (!sieve[i]){
-                for(int j = i; j <= m; j+=i){
-                    sieve[j] = 1;
-                    fact[j] *= i;
-                    nf[j]++;
-                }
+        int n; cin >> n;
+        vi cnt(n+2, 0);
+        vi a(n); 
+        fe(c, a) {
+            cin >> c;
+            cnt[c]++;
+        }
+        fr(i, 1, n){
+            if (cnt[i] >= 2){
+                cnt[i+1] += cnt[i]-2;
+                cnt[i] = 0;
             }
         }
-        int res = 0;
-        fr(j, 1, m){
-            if (fact[j] == j){
-                if (nf[j]%2 == 0){
-                    res = sum(res, bin_pow(m/j, n)); 
-                }else{
-                    res = sub(res, bin_pow(m/j, n));
-                }
-            }
-        }
-        cout << res << "\n";
+        bool ans = true;
+        fr(i, 1, n-1) if (cnt[i] != 0) ans = false;
+        if (ans) cout << "YES\n";
+        else cout << "NO\n";
     }
 
     #ifdef DEBUG

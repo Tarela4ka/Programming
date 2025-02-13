@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 
 using namespace std;
-#define int long long int
+#define int long long
 #define lll __int128_t
 #define fr(i, a, b) for (int i = (a); i <= (b); ++i)
 #define rf(i, a, b) for (int i = (a); i >= (b); --i)
@@ -16,38 +16,15 @@ using v = vector<T>;
 using vi = v<int>;
 using vii = v<ii>;
 using vvi = v<vi>;
-using vc = v<char>;
-using vvc = v<vc>;
 
 const int MOD = 998244353;
-const int INF = 1e16;
-
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int sub(int a, int b){
-    if (a >= b) return a-b;
-    else return MOD+a-b;
-}
-
-int bin_pow(int n, int p){
-    int res = 1;
-    while(p){
-        if (p&1) res = mult(res, n);
-        n = mult(n, n);
-        p>>=1;
-    }
-    return res;
-}
+const int INF = 1e14+10;
+const int maxn = 1e6+10;
 
 signed main(){
     ios::sync_with_stdio(false); 
     cin.tie(NULL); cout.tie(NULL);
     #ifdef DEBUG
-    srand(time(NULL));
     clock_t t1,t2;
     t1=clock();
     freopen("input.txt", "r", stdin);
@@ -56,29 +33,32 @@ signed main(){
 
     int t; cin >> t;
     while(t--){
-        int n, m; cin >> n >> m;
-        vi sieve(m+1, 0);
-        vi fact(m+1, 1), nf(m+1, 0);
-        fr(i, 2, m){
-            if (!sieve[i]){
-                for(int j = i; j <= m; j+=i){
-                    sieve[j] = 1;
-                    fact[j] *= i;
-                    nf[j]++;
-                }
-            }
+        int n, m;
+        cin >> n >> m;
+        vvi a(n, vi(m));
+        fe(c, a) fe(v, c) cin >> v;
+        int x = n*m+1;
+        vvi prefs(n, vi(m));
+        fr(i, 0, n-1) 
+            prefs[i][0] = a[i][0];
+        fr(i, 0, n-1)
+            fr(j, 1, m-1)
+                prefs[i][j] = prefs[i][j-1] + a[i][j];
+        int ans = 0;
+        fr(i, 0, n-1)
+            fr(j, 0, m-2)
+                ans += prefs[i][j];
+        vi vis(n, 0);
+        vi sums(n);
+        fr(i, 0, n-1)
+            sums[i] = prefs[i][m-1];
+        sort(rall(sums));
+        // fe(c, sums) cout << c << " ";
+        // cout << "\n";
+        fr(i, 0, n-1){
+            ans += sums[i]*(x-(i+1)*m);
         }
-        int res = 0;
-        fr(j, 1, m){
-            if (fact[j] == j){
-                if (nf[j]%2 == 0){
-                    res = sum(res, bin_pow(m/j, n)); 
-                }else{
-                    res = sub(res, bin_pow(m/j, n));
-                }
-            }
-        }
-        cout << res << "\n";
+        cout << ans << "\n";
     }
 
     #ifdef DEBUG

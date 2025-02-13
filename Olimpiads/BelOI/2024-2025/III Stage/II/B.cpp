@@ -19,29 +19,8 @@ using vvi = v<vi>;
 using vc = v<char>;
 using vvc = v<vc>;
 
-const int MOD = 998244353;
+const int MOD = 1e9+7;
 const int INF = 1e16;
-
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int sub(int a, int b){
-    if (a >= b) return a-b;
-    else return MOD+a-b;
-}
-
-int bin_pow(int n, int p){
-    int res = 1;
-    while(p){
-        if (p&1) res = mult(res, n);
-        n = mult(n, n);
-        p>>=1;
-    }
-    return res;
-}
 
 signed main(){
     ios::sync_with_stdio(false); 
@@ -54,32 +33,82 @@ signed main(){
     freopen("output.txt", "w", stdout);
     #endif
 
-    int t; cin >> t;
-    while(t--){
-        int n, m; cin >> n >> m;
-        vi sieve(m+1, 0);
-        vi fact(m+1, 1), nf(m+1, 0);
-        fr(i, 2, m){
-            if (!sieve[i]){
-                for(int j = i; j <= m; j+=i){
-                    sieve[j] = 1;
-                    fact[j] *= i;
-                    nf[j]++;
-                }
-            }
-        }
-        int res = 0;
-        fr(j, 1, m){
-            if (fact[j] == j){
-                if (nf[j]%2 == 0){
-                    res = sum(res, bin_pow(m/j, n)); 
-                }else{
-                    res = sub(res, bin_pow(m/j, n));
-                }
-            }
-        }
-        cout << res << "\n";
+    int n; cin >> n;
+    string s; cin >> s;
+    
+    int alfa, beta, gamma;
+    alfa=beta=gamma=0;
+    fe(c, s)
+        if (c == 'a') alfa++;
+        else if (c=='b') beta++;
+        else gamma++;
+    int nec = alfa%2 + beta%2 + gamma%2 - n%2;    
+    if (nec != 0) {
+        cout << -1;
+        return 0;
     }
+    
+    vvi p(3, vi(3, 0));
+    fr(i, 0, n/2-1){
+        p[s[i]-'a'][s[n-1-i]-'a']++;
+    }
+    int ans = 0;
+    if (n%2 == 1){
+        int need;
+        if (alfa%2) need = 0;
+        if (beta%2) need = 1;
+        if (gamma%2) need = 2;
+        int st = s[n/2]-'a';
+        if (st != need){
+            if (p[st][need] > 0){
+                p[need][need]++; p[st][need]--;
+                ans++;
+            }else if (p[need][st] > 0){
+                p[need][need]++; p[need][st]--;
+                ans++;
+            }else{
+                fr(i, 0, 2){
+                    if (i != need){
+                        if (p[need][i] > 0){
+                            p[st][i]++; p[need][i]--;
+                            ans++;
+                        }else if (p[i][need] > 0){
+                            p[i][st]++; p[i][need]--;
+                            ans++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fr(i, 0, 2){
+        fr(j, 0, 2){
+            if (i != j) {
+                ans += p[i][j]/2;
+                p[i][j] = p[i][j]%2;
+            }
+        }
+    }
+    fr(i, 0, 2){
+        int fl = i, sl = i;
+        fr(j, 0, 2) if (i!=j && p[i][j] > 0) fl = j;
+        fr(j, 0, 2) if (i!=j && p[j][i] > 0) sl = j;
+        if (sl == i && fl != i) {
+            fr(j, 0, 2) if (i!=j && p[j][i] > 0 && j != fl) sl = j;
+            if (sl != i) {
+                p[i][i]++; p[fl][sl]++;
+                p[i][fl]--; p[i][sl]--;
+                ans++;
+            }
+        }else{
+            if (fl != i && sl != i) {
+                p[i][i]++; p[fl][sl]++;
+                p[i][fl]--; p[sl][i]--;
+                ans++;
+            }
+        }
+    }
+    cout << ans;
 
     #ifdef DEBUG
     t2=clock();

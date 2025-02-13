@@ -19,27 +19,27 @@ using vvi = v<vi>;
 using vc = v<char>;
 using vvc = v<vc>;
 
-const int MOD = 998244353;
+const int MOD = 1e9+7;
 const int INF = 1e16;
+unordered_map<int, int> memo;
 
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int sub(int a, int b){
-    if (a >= b) return a-b;
-    else return MOD+a-b;
-}
-
-int bin_pow(int n, int p){
-    int res = 1;
-    while(p){
-        if (p&1) res = mult(res, n);
-        n = mult(n, n);
-        p>>=1;
+int P(int n, int c){
+    if (memo[n] != 0) return memo[n];
+    if (c >= 8) return 8;
+    int x = n;
+    while(x > 0){
+        if (x % 10 == 7) {
+            memo[n] = 1;
+            return 1;
+        }
+        x/=10;
     }
+    int add = 9, res = 8;
+    fr(i, 1, 9){
+        res = min(res, P(n+add, c+1)+1);
+        add *= 10; add += 9;
+    }
+    memo[n] = res;
     return res;
 }
 
@@ -56,29 +56,23 @@ signed main(){
 
     int t; cin >> t;
     while(t--){
-        int n, m; cin >> n >> m;
-        vi sieve(m+1, 0);
-        vi fact(m+1, 1), nf(m+1, 0);
-        fr(i, 2, m){
-            if (!sieve[i]){
-                for(int j = i; j <= m; j+=i){
-                    sieve[j] = 1;
-                    fact[j] *= i;
-                    nf[j]++;
-                }
+        // int n = rand() % 1000000000 + 10;
+        int n; cin >> n;
+        // cout << P(n, 1)-1 << "\n";
+        int ans = min(7LL, ((n%10 >= 7) ? (n%10-7) : (3+n%10)));
+        int s = n%10; n/=10;
+        while(n > 0){
+            int x = n%10;
+            int res = (x > 7) ? (17-x) : (7-x);
+            if (res > s) {
+                res++;
+                if (x == 8) res = min(res, s+1);
             }
+            ans = min(ans, res);             
+            s += x * 10;
+            n/=10;
         }
-        int res = 0;
-        fr(j, 1, m){
-            if (fact[j] == j){
-                if (nf[j]%2 == 0){
-                    res = sum(res, bin_pow(m/j, n)); 
-                }else{
-                    res = sub(res, bin_pow(m/j, n));
-                }
-            }
-        }
-        cout << res << "\n";
+        cout << ans << "\n";
     }
 
     #ifdef DEBUG
