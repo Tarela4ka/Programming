@@ -16,26 +16,15 @@ using v = vector<T>;
 using vi = v<int>;
 using vii = v<ii>;
 using vvi = v<vi>;
-using vc = v<char>;
-using vvc = v<vc>;
 
-const int MOD = 1e9+7;
-const int INF = 1e10;
+const int MOD = 998244353;
+const int INF = 1e16 + 10;
 
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int bin_pow(int n, int p){
-    if (p == 0) return 1;
-    if (p == 1) return n;
-    if (p%2 == 1) return mult(bin_pow(mult(n, n), p/2), n);
-    return bin_pow(mult(n, n), p/2);
-}
-int inv(int n){
-    return bin_pow(n, MOD-2);
+bool comp(ii a, ii b){
+    if (a.first < b.first) return true;
+    if (a.first > b.first) return false;
+    if (a.second > b.second) return true;
+    return false;
 }
 
 signed main(){
@@ -48,21 +37,18 @@ signed main(){
     freopen("output.txt", "w", stdout);
     #endif
 
-    int n, k; cin >> n >> k;
-    vi a(n); fe(c, a) cin >> c;
-    vi bins(n, 0), ans(n, 0), fact(k+1, 1);
-    fr(i, 2, k) fact[i] = mult(fact[i-1], i);
-    fr(i, 0, k){
-        int j = i%n;
-        bins[j] = sum(bins[j], mult(fact[k], mult(inv(fact[i]), inv(fact[k-i])) ));
-    }
-    fr(i, 0, n-1){
-        fr(j, 0, n-1){
-            int x = (i+j)%n;
-            ans[x] = sum(ans[x], mult(bins[j], a[i]));
+    int t; cin >> t;
+    while(t--){
+        int n; cin >> n;
+        bool ans = true;
+        fr(i, 1, n) {
+            int c; cin >> c;
+            if (abs(i-c) > 1) ans = false;
         }
+        if (ans) cout << "YES\n";
+        else cout << "NO\n";
+        
     }
-    fe(c, ans) cout << c << " ";
 
     #ifdef DEBUG
     t2=clock();

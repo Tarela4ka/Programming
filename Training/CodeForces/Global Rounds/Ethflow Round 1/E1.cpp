@@ -16,26 +16,81 @@ using v = vector<T>;
 using vi = v<int>;
 using vii = v<ii>;
 using vvi = v<vi>;
-using vc = v<char>;
-using vvc = v<vc>;
 
-const int MOD = 1e9+7;
-const int INF = 1e10;
+const int MOD = 998244353;
+const int INF = 1e9+10;
+int logn;
+vvi g, dp;
+vi p, d, vis;
 
-int sum(int a, int b){
-    return (a+b)%MOD;
+void dfs(vi& vis, int v){
+    vis[v] = 1;
+    fe(c, g[v]){
+        if (!vis[c]) {
+            d[c] = d[v]+1;
+            p[c] = v;
+            dfs(vis, c);
+        }
+    }
 }
-int mult(int a, int b){
-    return (a*b)%MOD;
+
+int lca(int v, int u){
+    if (d[v] > d[u]) swap(u, v);
+    rf(i, logn, 0)
+        if (d[dp[u][i]] - d[v] >= 0)    
+            u = dp[u][i];
+
+    if (v == u) return v;
+    rf(i, logn, 0){
+        if (dp[v][i] != dp[u][i]){
+            v = dp[v][i];
+            u = dp[u][i];
+        }
+    }
+    return p[v];
 }
-int bin_pow(int n, int p){
-    if (p == 0) return 1;
-    if (p == 1) return n;
-    if (p%2 == 1) return mult(bin_pow(mult(n, n), p/2), n);
-    return bin_pow(mult(n, n), p/2);
-}
-int inv(int n){
-    return bin_pow(n, MOD-2);
+
+void solve(){
+    int n; cin >> n;
+    logn = log2(n)+1;
+    g.clear(); g.resize(n); 
+    vii cost(n); fr(i, 0, n-1) {
+        cin >> cost[i].first; 
+        cost[i].second = i;
+    }
+    sort(rall(cost));
+    fr(i, 0, n-2) {
+        int a, b; cin >> a >> b; a--; b--;
+        g[a].push_back(b);
+        g[b].push_back(a);
+    }
+    p.assign(n, 0), d.assign(n, 0), vis.assign(n, 0);
+    d[0] = p[0] = 0;
+    dfs(vis, 0);
+    dp.assign(n, vi(logn+1, 0));
+    fr(i, 0, n-1) dp[i][0] = p[i];
+    fr(i, 1, logn)
+        fr(j, 0, n-1)
+            dp[j][i] = dp[dp[j][i-1]][i-1];
+        
+    int o = cost[0].second;
+    int p = cost[0].first;
+    fr(i, 1, n-1){
+        if (p != cost[i].first){
+            p = cost[i].first;
+            int v = o;
+            for(int j = i; cost[i].first == cost[j].first && j < n; j++){
+                if (lca(v, cost[j].second) != cost[j].second){
+                    cout << cost[j].second+1 << "\n";
+                    return;
+                }
+                o = lca(o, cost[j].second);
+                i = j;
+            }
+        }
+        o = lca(o, cost[i].second);
+    }
+    cout << 0 << "\n";
 }
 
 signed main(){
@@ -48,21 +103,10 @@ signed main(){
     freopen("output.txt", "w", stdout);
     #endif
 
-    int n, k; cin >> n >> k;
-    vi a(n); fe(c, a) cin >> c;
-    vi bins(n, 0), ans(n, 0), fact(k+1, 1);
-    fr(i, 2, k) fact[i] = mult(fact[i-1], i);
-    fr(i, 0, k){
-        int j = i%n;
-        bins[j] = sum(bins[j], mult(fact[k], mult(inv(fact[i]), inv(fact[k-i])) ));
+    int t; cin >> t;
+    while(t--){
+        solve();
     }
-    fr(i, 0, n-1){
-        fr(j, 0, n-1){
-            int x = (i+j)%n;
-            ans[x] = sum(ans[x], mult(bins[j], a[i]));
-        }
-    }
-    fe(c, ans) cout << c << " ";
 
     #ifdef DEBUG
     t2=clock();

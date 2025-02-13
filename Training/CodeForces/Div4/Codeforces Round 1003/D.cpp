@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 
 using namespace std;
-#define int long long int
+#define int long long
 #define lll __int128_t
 #define fr(i, a, b) for (int i = (a); i <= (b); ++i)
 #define rf(i, a, b) for (int i = (a); i >= (b); --i)
@@ -16,27 +16,10 @@ using v = vector<T>;
 using vi = v<int>;
 using vii = v<ii>;
 using vvi = v<vi>;
-using vc = v<char>;
-using vvc = v<vc>;
 
-const int MOD = 1e9+7;
-const int INF = 1e10;
-
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int bin_pow(int n, int p){
-    if (p == 0) return 1;
-    if (p == 1) return n;
-    if (p%2 == 1) return mult(bin_pow(mult(n, n), p/2), n);
-    return bin_pow(mult(n, n), p/2);
-}
-int inv(int n){
-    return bin_pow(n, MOD-2);
-}
+const int MOD = 998244353;
+const int INF = 1e14+10;
+const int maxn = 1e6+10;
 
 signed main(){
     ios::sync_with_stdio(false); 
@@ -48,21 +31,35 @@ signed main(){
     freopen("output.txt", "w", stdout);
     #endif
 
-    int n, k; cin >> n >> k;
-    vi a(n); fe(c, a) cin >> c;
-    vi bins(n, 0), ans(n, 0), fact(k+1, 1);
-    fr(i, 2, k) fact[i] = mult(fact[i-1], i);
-    fr(i, 0, k){
-        int j = i%n;
-        bins[j] = sum(bins[j], mult(fact[k], mult(inv(fact[i]), inv(fact[k-i])) ));
-    }
-    fr(i, 0, n-1){
-        fr(j, 0, n-1){
-            int x = (i+j)%n;
-            ans[x] = sum(ans[x], mult(bins[j], a[i]));
+    int t; cin >> t;
+    while(t--){
+        int n, m;
+        cin >> n >> m;
+        vvi a(n, vi(m));
+        fe(c, a) fe(v, c) cin >> v;
+        int x = n*m+1;
+        vvi prefs(n, vi(m));
+        fr(i, 0, n-1) 
+            prefs[i][0] = a[i][0];
+        fr(i, 0, n-1)
+            fr(j, 1, m-1)
+                prefs[i][j] = prefs[i][j-1] + a[i][j];
+        int ans = 0;
+        fr(i, 0, n-1)
+            fr(j, 0, m-2)
+                ans += prefs[i][j];
+        vi vis(n, 0);
+        vi sums(n);
+        fr(i, 0, n-1)
+            sums[i] = prefs[i][m-1];
+        sort(rall(sums));
+        // fe(c, sums) cout << c << " ";
+        // cout << "\n";
+        fr(i, 0, n-1){
+            ans += sums[i]*(x-(i+1)*m);
         }
+        cout << ans << "\n";
     }
-    fe(c, ans) cout << c << " ";
 
     #ifdef DEBUG
     t2=clock();

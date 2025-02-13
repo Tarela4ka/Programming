@@ -22,22 +22,6 @@ using vvc = v<vc>;
 const int MOD = 1e9+7;
 const int INF = 1e10;
 
-int sum(int a, int b){
-    return (a+b)%MOD;
-}
-int mult(int a, int b){
-    return (a*b)%MOD;
-}
-int bin_pow(int n, int p){
-    if (p == 0) return 1;
-    if (p == 1) return n;
-    if (p%2 == 1) return mult(bin_pow(mult(n, n), p/2), n);
-    return bin_pow(mult(n, n), p/2);
-}
-int inv(int n){
-    return bin_pow(n, MOD-2);
-}
-
 signed main(){
     ios::sync_with_stdio(false); 
     cin.tie(NULL); cout.tie(NULL);
@@ -47,22 +31,48 @@ signed main(){
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
     #endif
-
-    int n, k; cin >> n >> k;
-    vi a(n); fe(c, a) cin >> c;
-    vi bins(n, 0), ans(n, 0), fact(k+1, 1);
-    fr(i, 2, k) fact[i] = mult(fact[i-1], i);
-    fr(i, 0, k){
-        int j = i%n;
-        bins[j] = sum(bins[j], mult(fact[k], mult(inv(fact[i]), inv(fact[k-i])) ));
-    }
-    fr(i, 0, n-1){
-        fr(j, 0, n-1){
-            int x = (i+j)%n;
-            ans[x] = sum(ans[x], mult(bins[j], a[i]));
+    
+    int t; cin >> t;
+    while(t--){
+        int n; cin >> n;
+        vi a(n); fe(c, a) cin >> c;
+        vi cnt(3), b;
+        b = a; sort(all(b));
+        v<set<int>> bor(3);
+        vii ans;
+        fr(i, 0, n-1) bor[a[i]].insert(i);
+        rf(i, n-1, 0){
+            int need = b[i];
+            if (a[i] == need) {
+                bor[a[i]].erase(i);
+                continue;
+            }
+            if (need == 2 && a[i] == 0){
+                auto ind = bor[1].begin();
+                ans.push_back({*ind, i});
+                swap(a[i], a[*ind]);
+                bor[0].insert(*ind); bor[1].erase(ind); 
+                bor[1].insert(i); bor[0].erase(i); 
+            }
+            if (need == 2 && a[i] == 1){
+                auto ind = bor[2].begin();
+                ans.push_back({*ind, i});
+                swap(a[i], a[*ind]);
+                bor[1].insert(*ind); bor[2].erase(ind); 
+                bor[2].insert(i); bor[1].erase(i); 
+            }
+            if (need == 1 && a[i] == 0){
+                auto ind = bor[1].begin();
+                ans.push_back({*ind, i});
+                swap(a[i], a[*ind]);
+                bor[0].insert(*ind); bor[1].erase(ind); 
+                bor[1].insert(i); bor[0].erase(i); 
+            }
+            bor[a[i]].erase(i);
         }
+        cout << ans.size() << "\n";
+        fe(c, ans) cout << c.first+1 << " " << c.second+1 << "\n";
     }
-    fe(c, ans) cout << c << " ";
 
     #ifdef DEBUG
     t2=clock();

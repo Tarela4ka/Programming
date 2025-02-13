@@ -10,5 +10,5 @@ using vi = vector<int>;
 
 signed main() {
     cout << "Hello World!";
-   return 0;
+    return 0;
 }
