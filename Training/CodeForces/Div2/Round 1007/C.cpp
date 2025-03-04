@@ -12,8 +12,6 @@ using namespace std;
 #define mk(a,b) make_pair(a,b)
 #define pb(b) push_back(b)
 #define LSOne(S) (S & (-S))
-#define lc(S) ((S << 1) + 1)
-#define rc(S) ((S << 1) + 2)
 using ii = pair<int, int>;
 using ic = pair<int, char>;
 template <typename T>
@@ -26,51 +24,19 @@ using vvc = v<vc>;
 
 const int MOD = 998244353;
 const int INF = 1e16;
-const int maxa = 1e5+10;
+// const int maxn = 2e5+10;
+int maxn;
 
-bool cmp(int a, int b){
-    return (a > b);
-}
-vvi spt;
-void build(vi& a){
-    int n = a.size(), logn = log2(n)+2; 
-    spt.assign(logn, vi(n, 0));
-    fr(i, 0, n-1) spt[0][i] = a[i];
-    fr(j, 1, logn-1){
-        fr(i, 0, n-1-(1<<(j-1))){
-            spt[j][i] = max(spt[j-1][i], spt[j-1][i+(1<<(j-1))]);
+vvi g;
+vvi d;
+
+void dfs(int par, int v, int deep){
+    fe(c, g[v]){
+        if (c != par){
+            d[deep].pb(c);
+            dfs(v, c, deep+1);
         }
     }
-}
-int rmq(int l, int r) {
-    int t = __lg(r - l);
-    return max(spt[t][l], spt[t][r - (1 << t)]);
-}
-void solve(){
-    int n, m; cin >> m >> n;
-    vvi spt;
-    vi a(m), ts(n); 
-    fe(c, a) cin >> c; 
-    fe(c, ts) cin >> c;
-    int k = a[0];
-    sort(all(a));
-    vi b(n); 
-    fr(i,0,n-1){
-        if (ts[i] <= k) {b[i] = 0; continue;}
-        b[i] = m-(lower_bound(all(a), ts[i]) - a.begin());
-    }
-    sort(all(b)); 
-    build(b);
-    fr(k, 1, n){
-        int res = 0;
-        int l = 0, r = k-1;
-        while(r < n){
-            res += rmq(l, r+1)+1;
-            l = r+1; r += k;
-        }
-        cout << res << " ";
-    }
-    cout << '\n';
 }
 
 signed main(){
@@ -85,7 +51,21 @@ signed main(){
     #endif
 
     int t; cin >> t;
-    while(t--) solve();
+    while(t--){
+        int n, st, en; cin >> n >> st >> en; st--; en--;
+        d.clear(); d.resize(n); 
+        g.clear(); g.resize(n); 
+        fr(i, 0, n-2){
+            int a, b; cin >> a >> b; a--; b--;
+            g[a].pb(b); g[b].pb(a);
+        }
+        d[0].pb(en);
+        dfs(en, en, 1);
+        rf(i, n-1, 0){
+            fe(c, d[i]) cout << c+1 << " ";
+        }
+        cout << '\n';
+    }
 
     #ifdef DEBUG
     t2=clock();

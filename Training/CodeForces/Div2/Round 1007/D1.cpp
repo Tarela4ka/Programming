@@ -12,8 +12,6 @@ using namespace std;
 #define mk(a,b) make_pair(a,b)
 #define pb(b) push_back(b)
 #define LSOne(S) (S & (-S))
-#define lc(S) ((S << 1) + 1)
-#define rc(S) ((S << 1) + 2)
 using ii = pair<int, int>;
 using ic = pair<int, char>;
 template <typename T>
@@ -26,51 +24,29 @@ using vvc = v<vc>;
 
 const int MOD = 998244353;
 const int INF = 1e16;
-const int maxa = 1e5+10;
+// const int maxn = 2e5+10;
+int maxn;
 
-bool cmp(int a, int b){
-    return (a > b);
-}
-vvi spt;
-void build(vi& a){
-    int n = a.size(), logn = log2(n)+2; 
-    spt.assign(logn, vi(n, 0));
-    fr(i, 0, n-1) spt[0][i] = a[i];
-    fr(j, 1, logn-1){
-        fr(i, 0, n-1-(1<<(j-1))){
-            spt[j][i] = max(spt[j-1][i], spt[j-1][i+(1<<(j-1))]);
-        }
+vi a, prefs;
+int n;
+
+unordered_map<int, unordered_map<int, int>> memo;
+
+int P(int l, int r){
+    int res;
+    if (n%2 == 1) res = prefs[n];
+    else res = prefs[n+1];
+    if (r%2 == 0) {
+        int num;
+        if (r < maxn) num = a[r];
+        else num = P(1, r / 2);
+        res = res^num;
     }
+    return res;
 }
-int rmq(int l, int r) {
-    int t = __lg(r - l);
-    return max(spt[t][l], spt[t][r - (1 << t)]);
-}
-void solve(){
-    int n, m; cin >> m >> n;
-    vvi spt;
-    vi a(m), ts(n); 
-    fe(c, a) cin >> c; 
-    fe(c, ts) cin >> c;
-    int k = a[0];
-    sort(all(a));
-    vi b(n); 
-    fr(i,0,n-1){
-        if (ts[i] <= k) {b[i] = 0; continue;}
-        b[i] = m-(lower_bound(all(a), ts[i]) - a.begin());
-    }
-    sort(all(b)); 
-    build(b);
-    fr(k, 1, n){
-        int res = 0;
-        int l = 0, r = k-1;
-        while(r < n){
-            res += rmq(l, r+1)+1;
-            l = r+1; r += k;
-        }
-        cout << res << " ";
-    }
-    cout << '\n';
+int getNum(int k){
+    if (k < maxn) return a[k];
+    return P(1, k/2);
 }
 
 signed main(){
@@ -85,7 +61,21 @@ signed main(){
     #endif
 
     int t; cin >> t;
-    while(t--) solve();
+    while(t--){
+        int l, r; cin >> n >> l >> r;
+        maxn = n+100;
+        a.assign(maxn+1, 0); fr(i, 1, n) cin >> a[i];
+        prefs.assign(maxn+1, 0);
+        fr(i, 1, maxn) {
+            if (i > n) a[i] = prefs[i/2];
+            prefs[i] = (prefs[i-1]^a[i]);
+        }
+        // fr(i, 10, 100){
+        //     cout << i << " " << a[i] << " " << getNum(i) << '\n';
+        // }
+        // cout << a[l] << " ";
+        cout << getNum(l) << "\n";
+    }
 
     #ifdef DEBUG
     t2=clock();

@@ -28,49 +28,24 @@ const int MOD = 998244353;
 const int INF = 1e16;
 const int maxa = 1e5+10;
 
-bool cmp(int a, int b){
-    return (a > b);
-}
-vvi spt;
-void build(vi& a){
-    int n = a.size(), logn = log2(n)+2; 
-    spt.assign(logn, vi(n, 0));
-    fr(i, 0, n-1) spt[0][i] = a[i];
-    fr(j, 1, logn-1){
-        fr(i, 0, n-1-(1<<(j-1))){
-            spt[j][i] = max(spt[j-1][i], spt[j-1][i+(1<<(j-1))]);
-        }
-    }
-}
-int rmq(int l, int r) {
-    int t = __lg(r - l);
-    return max(spt[t][l], spt[t][r - (1 << t)]);
-}
 void solve(){
-    int n, m; cin >> m >> n;
-    vvi spt;
-    vi a(m), ts(n); 
-    fe(c, a) cin >> c; 
-    fe(c, ts) cin >> c;
-    int k = a[0];
-    sort(all(a));
-    vi b(n); 
-    fr(i,0,n-1){
-        if (ts[i] <= k) {b[i] = 0; continue;}
-        b[i] = m-(lower_bound(all(a), ts[i]) - a.begin());
-    }
-    sort(all(b)); 
-    build(b);
-    fr(k, 1, n){
-        int res = 0;
-        int l = 0, r = k-1;
-        while(r < n){
-            res += rmq(l, r+1)+1;
-            l = r+1; r += k;
+    string a, b, s;
+    cin >> a >> b >> s;
+    int n = b.length(), m = a.length();
+    vvi dp(n+1, vi(m+1, INF));
+    dp[0][0] = 0;
+    fr(i, 1, n) dp[i][0] = dp[i-1][0]+(s[i-1] != b[i-1]);
+    fr(i, 1, m) dp[0][i] = dp[0][i-1]+(s[i-1] != a[i-1]);
+    fr(i, 1, n){
+        fr(j, 1, m){
+            dp[i][j] = min(dp[i][j-1] + (s[i+j-1] != a[j-1]), dp[i-1][j] + (s[i+j-1] != b[i-1]));
         }
-        cout << res << " ";
     }
-    cout << '\n';
+    cout << dp[n][m] << '\n';
+    // fe(c, dp){
+    //     fe(v, c) cout << v << " ";
+    //     cout << '\n';
+    // }
 }
 
 signed main(){

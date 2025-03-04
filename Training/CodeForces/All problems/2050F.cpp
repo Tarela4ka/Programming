@@ -28,47 +28,53 @@ const int MOD = 998244353;
 const int INF = 1e16;
 const int maxa = 1e5+10;
 
-bool cmp(int a, int b){
-    return (a > b);
-}
-vvi spt;
-void build(vi& a){
-    int n = a.size(), logn = log2(n)+2; 
-    spt.assign(logn, vi(n, 0));
-    fr(i, 0, n-1) spt[0][i] = a[i];
-    fr(j, 1, logn-1){
-        fr(i, 0, n-1-(1<<(j-1))){
-            spt[j][i] = max(spt[j-1][i], spt[j-1][i+(1<<(j-1))]);
-        }
+struct segTree{
+private:
+    vi st;
+    int size;
+public:
+    void init(int n){
+        size = 1;
+        while(size < n) size<<=1;
+        st.assign(size*2, 0);
     }
-}
-int rmq(int l, int r) {
-    int t = __lg(r - l);
-    return max(spt[t][l], spt[t][r - (1 << t)]);
-}
+    void build(vi a){
+        init(a.size());
+        build(a, 0, 0, size);
+    }
+    segTree(vi a){
+        build(a);
+    }
+    void build(vi& a, int v, int lv, int rv){
+        if (rv - lv == 1){
+            if (lv < a.size()) st[v] = a[lv];
+            return;
+        }
+        int m = (lv+rv)/2;
+        build(a, lc(v), lv, m);
+        build(a, rc(v), m, rv);
+        st[v] = gcd(st[lc(v)], st[rc(v)]);
+    }
+    int rgcd(int l, int r){
+        return rgcd(l, r, 0, 0, size);
+    }
+    int rgcd(int l, int r, int v, int lv, int rv){
+        if (rv <= l || lv >= r) return 0;
+        if (lv >= l && rv <= r) return st[v];
+        int m = (lv+rv)/2;
+        return gcd(rgcd(l, r, lc(v), lv, m), rgcd(l, r, rc(v), m, rv));
+    }
+};
+
 void solve(){
-    int n, m; cin >> m >> n;
-    vvi spt;
-    vi a(m), ts(n); 
-    fe(c, a) cin >> c; 
-    fe(c, ts) cin >> c;
-    int k = a[0];
-    sort(all(a));
-    vi b(n); 
-    fr(i,0,n-1){
-        if (ts[i] <= k) {b[i] = 0; continue;}
-        b[i] = m-(lower_bound(all(a), ts[i]) - a.begin());
-    }
-    sort(all(b)); 
-    build(b);
-    fr(k, 1, n){
-        int res = 0;
-        int l = 0, r = k-1;
-        while(r < n){
-            res += rmq(l, r+1)+1;
-            l = r+1; r += k;
-        }
-        cout << res << " ";
+    int n,q; cin >> n >> q;
+    vi a(n), b(n-1); fe(c, a) cin >> c;
+    fr(i,0,n-2) b[i] = abs(a[i]-a[i+1]);
+    segTree st(b);
+    while(q--){
+        int l, r; cin >> l >> r; l--; r--;
+        if (r == l) cout << 0 << " ";
+        else cout << st.rgcd(l, r) << ' ';
     }
     cout << '\n';
 }
